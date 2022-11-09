@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Padded Image Viewer</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <input id="fileButton" type="file" accept=".pad"></input>
+    <img id="imageViewer" />
+    <script>
+        const fileButton = document.querySelector('#fileButton');
+        const imageViewer = document.querySelector('#imageViewer');
+
+        const getFileBytes = async (file) => {
+            let a, r;
+            const promise = new Promise((acc, rej) => { a = acc, r = rej });
+
+            const reader = new FileReader();
+            reader.onloadend = e => {
+                reader.result
+                a(reader.result);
+            };
+            reader.onerror = err => r(err);
+
+            reader.readAsArrayBuffer(file);
+            const bytes = await promise;
+            return new Uint8Array(bytes);
+        }
+
+        const bytesToNumber = (bytes) => new DataView(bytes.buffer).getUint32();
+
+        fileButton.addEventListener('change', async e => {
+            const file = fileButton.files[0];
+            const bytes = await getFileBytes(file);
+            const unpaddedSize = bytesToNumber(bytes.slice(0, 4));
+            const imageUrl = URL.createObjectURL(new Blob([bytes.slice(4, 4+unpaddedSize)], { type: 'image/*'}));
+            console.log(imageUrl)
+            imageViewer.setAttribute('src', imageUrl);
+        })
+    </script>
+</body>
+
+</html>
