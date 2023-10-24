@@ -33,12 +33,16 @@
 
         const bytesToNumber = (bytes) => new DataView(bytes.buffer).getUint32();
 
-        fileButton.addEventListener('change', async e => {
+        fileButton.addEventListener('click', e => {
+            fileButton.value = null
+        })
+
+        fileButton.addEventListener('input', async e => {
+            imageViewer.setAttribute('src', null)
             const file = fileButton.files[0];
             const bytes = await getFileBytes(file);
             const unpaddedSize = bytesToNumber(bytes.slice(0, 4));
             const imageUrl = URL.createObjectURL(new Blob([bytes.slice(4, 4+unpaddedSize)], { type: 'image/*'}));
-            console.log(imageUrl)
             imageViewer.setAttribute('src', imageUrl);
         })
     </script>
